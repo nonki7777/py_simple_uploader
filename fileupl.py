@@ -29,6 +29,19 @@ thiscgifile = os.path.basename(__file__)
 def getcwd():
     return os.getcwd()
 
+def remove(filename):
+    if os.path.isfile(filename):
+        os.remove(filename)
+
+def listdir(fpath):
+    return os.listdir(fpath)
+
+def chmod(fpath):
+    os.system('chmod 644 ' + fpath)
+
+def isfileimage(fpath):
+    return commands.getoutput('file ' + fpath).find("image") == -1
+
 
 class FormAnalyzer(object):
     """HTMLのformパラメーターを調べて結果を出力するための前処理を行う"""
@@ -56,6 +69,32 @@ class FormAnalyzer(object):
 
     def chkExt(self, ext):
         return re.match('^\.(jpe?g|png|gif)$', ext)
+    
+    def do_upload(self, rf, wf, fpath):
+        upcnt = 0
+        while True:
+            upcnt += 1
+            if upcnt > up_limit:
+                reach_max = True
+                break
+            chunk = rf.read(1024)
+            if not chunk:
+                reach_max = False
+                break
+            wf.write(chunk)
+        wf.close()
+        chmod(fpath)
+        return reach_max
+
+    def delete_oldest(self):
+        fsrc = os.path.join(getcwd(), dir_src)
+        while len(listdir(fsrc)) > maxfilenum:
+            oldestfile = sorted(listdir(fsrc))[0]
+            base = os.path.splitext(oldestfile)[0]
+            src = os.path.join(fsrc, oldestfile)
+            db = os.path.join(getcwd(), dir_db, base + '.txt')
+            remove(src)
+            remove(db)
 
     def save_uploaded_file(self, form):
         item = form['file']
@@ -70,40 +109,20 @@ class FormAnalyzer(object):
         fsrc = os.path.join(getcwd(), dir_src)
         fpath = os.path.join(fsrc, fname)
         fout = file(fpath, 'wb')
-        upcnt = 0  # 受信バイト数をkBで表す
-        while True:
-            upcnt += 1
-            if upcnt > up_limit:
-                reach_max = True
-                break
-            chunk = item.file.read(1024)
-            if not chunk:
-                reach_max = False
-                break
-            fout.write(chunk)
-        fout.close()
-        os.system('chmod 644 ' + fpath)
+        reach_max = self.do_upload(item.file, fout, fpath)
         if reach_max:
-            os.remove(fpath)
+            remove(fpath)
             return 'ファイルサイズが大きすぎます。(%s%s)' % \
                     (str(up_limit), 'KBまで')
-        if commands.getoutput('file ' + fpath).find("image") == -1:
-            os.remove(fpath)
+        if isfileimage(fpath):
+            remove(fpath)
             return '画像データではありません。'
         if author.value:
             fout = file(os.path.join(getcwd(), dir_db, \
                 str(now) + '.txt'), 'wa')
             fout.write(author.value)
             fout.close()
-        while len(os.listdir(fsrc)) > maxfilenum:
-            oldestfile = sorted(os.listdir(fsrc))[0]
-            base = os.path.splitext(oldestfile)[0]
-            src = os.path.join(fsrc, oldestfile)
-            db = os.path.join(getcwd(), dir_db, base + '.txt')
-            if os.path.isfile(src):
-                os.remove(src)
-            if os.path.isfile(db):
-                os.remove(db)
+        self.delete_oldest()
         return 'アップロード完了。'
 
     def delete_saved_files(self, form):
@@ -120,10 +139,8 @@ class FormAnalyzer(object):
             opass = f.read()
             f.close()
         if upass == opass:
-            if os.path.isfile(src):
-                os.remove(src)
-            if os.path.isfile(db):
-                os.remove(db)
+            remove(src)
+            remove(db)
             return '削除完了。'
         else:
             return 'パスワードが違います。'
@@ -215,10 +232,10 @@ class HTMLBuilder(object):
         print('    <th width="100">容量</th>')
         print('  </tr>')
         cnt = 0
-        all_sorted_list = reversed(sorted(os.listdir(os.path.join(getcwd(),
+        all_sorted_list = reversed(sorted(listdir(os.path.join(getcwd(),
             dir_src))))
         sorted_list = []
-        # os.listdirではドット(.)で始まるファイルも捕捉してしまうので除去する
+        # listdirではドット(.)で始まるファイルも捕捉してしまうので除去する
         for item in all_sorted_list:
             if item[0] != '.':
                 sorted_list.append(item)
