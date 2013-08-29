@@ -58,11 +58,11 @@ class FormAnalyzer(object):
         elif form.has_key('page'):
             page = self.set_page(form)
             if page == -1:
-                result = 'ページ番号が不正です。'
+                result = _('ページ番号が不正です。')
             else:
                 gotoredirect = False
         elif form.has_key('file') or form.has_key('kill'):
-            result = 'フォーム要素が不正です。'
+            result = _('フォーム要素が不正です。')
         else:
             gotoredirect = False
         return (result, page, gotoredirect)
@@ -100,10 +100,10 @@ class FormAnalyzer(object):
         item = form['file']
         author = form['author']
         if not (item.file and item.filename):
-            return 'ファイルが指定されていません。'
+            return _('ファイルが指定されていません。')
         base, ext = os.path.splitext(item.filename)
         if not self.chkExt(ext):
-            return '許可されていない拡張子です。'
+            return _('許可されていない拡張子です。')
         now = int(time())
         fname = str(now) + ext
         fsrc = os.path.join(getcwd(), dir_src)
@@ -112,18 +112,18 @@ class FormAnalyzer(object):
         reach_max = self.do_upload(item.file, fout, fpath)
         if reach_max:
             remove(fpath)
-            return 'ファイルサイズが大きすぎます。(%s%s)' % \
-                    (str(up_limit), 'KBまで')
+            return _('ファイルサイズが大きすぎます。(%sKBまで)') \
+                % str(up_limit)
         if isfileimage(fpath):
             remove(fpath)
-            return '画像データではありません。'
+            return _('画像データではありません。')
         if author.value:
             fout = file(os.path.join(getcwd(), dir_db, \
                 str(now) + '.txt'), 'wa')
             fout.write(author.value)
             fout.close()
         self.delete_oldest()
-        return 'アップロード完了。'
+        return _('アップロード完了。')
 
     def delete_saved_files(self, form):
         if form.has_key('pass'):
@@ -141,9 +141,9 @@ class FormAnalyzer(object):
         if upass == opass:
             remove(src)
             remove(db)
-            return '削除完了。'
+            return _('削除完了。')
         else:
-            return 'パスワードが違います。'
+            return _('パスワードが違います。')
 
     def set_page(self, form):
         try:
@@ -181,7 +181,8 @@ class HTMLBuilder(object):
         print('<body>')
         print('%s<br>' % result)
         print('<br>')
-        print('しばらくお待ちください。 ... <a href="%s" target="_self">戻る</a><br>' % thiscgifile)
+        print(_('しばらくお待ちください。') + \
+              ' ... <a href="%s" target="_self">' + _('戻る') + '</a><br>' % thiscgifile)
         print('</body></html>')
 
     def html_normal(self, page):
@@ -191,10 +192,12 @@ class HTMLBuilder(object):
 
         print('<table width="830" cellspacing="0" cellpadding="0" style="margin:10px;">')
         print('<td>')
-        print('<li>簡易アップローダ。')
-        print('<li>%sまでの画像ファイルをアップロード出来ます。また、古い順から画像は削除されます。'
+        print('<li>' + _('簡易アップローダ。'))
+        print('<li>' + _('%sまでの画像ファイルをアップロード出来ます。') + \
+            _('また、古い順から画像は削除されます。') \
             % (str(up_limit / 1024) + "MB"))
-        print('<li>その他の情報は、<a href="/" target="_blank">こちらのトップページ</a>をご覧ください。')
+        print('<li>' + \
+            _('その他の情報は、<a href="/" target="_blank">こちらのトップページ</a>をご覧ください。'))
         print('</td>')
         print('</table>')
 
@@ -205,11 +208,12 @@ class HTMLBuilder(object):
 
         # 投稿フォーム
         print('<fieldset style="border:2px solid silver">')
-        print('<legend>新規投稿</legend>')
-        print('ファイル(' + str(up_limit) + 'KBまで)：<input type="file" name="file" style="height:18px;color:black;background:white;border:1px solid silver" />')
-        print('削除パス(任意)：<input type="text" name="author" style="width:80px;height:18px;color:black;background:white;border:1px solid silver" />')
-        print('<input type="submit" value="投稿" style="width:50px;height:18px;color:black;background:white;border:1px solid silver" />')
-        print('<span align="right">ファイル保持数：' + str(maxfilenum) + ' 件 (最大'
+        print('<legend>' + _('新規投稿') + '</legend>')
+        print(_('ファイル') + '(' + str(up_limit) + _('KBまで') + '): <input type="file" name="file" style="height:18px;color:black;background:white;border:1px solid silver" />')
+        print(_('削除パス(任意)') + ': <input type="text" name="author" style="width:80px;height:18px;color:black;background:white;border:1px solid silver" />')
+        print('<input type="submit" value="' + _("投稿") + '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver" />')
+        print('<span align="right">' + _("ファイル保持数") + ':' + \
+                str(maxfilenum) + ' ' + _('件') + ' (' + _('最大') \
             + str(maxfilenum*up_limit/1024) + 'MB)</span>')
         print('</fieldset>')
 
@@ -223,13 +227,13 @@ class HTMLBuilder(object):
         print('  <table id="listview" border="1" rules="all"')
         print('    cellpadding="5" style="display:block;">')
         print('  <tr>')
-        print('    <td colspan="4">保管ファイル</td>')
+        print('    <td colspan="4">' + _('保管ファイル') + '</td>')
         print('  </tr>')
         print('  <tr>')
-        print('    <th width="80">選択</th>')
-        print('    <th width="320">ファイル名</th>')
-        print('    <th width="320">日付</th>')
-        print('    <th width="100">容量</th>')
+        print('    <th width="80">' + _('選択') + '</th>')
+        print('    <th width="320">' + _('ファイル名') + '</th>')
+        print('    <th width="320">' + _('日付') + '</th>')
+        print('    <th width="100">' + _('容量') + '</th>')
         print('  </tr>')
         cnt = 0
         all_sorted_list = reversed(sorted(listdir(os.path.join(getcwd(),
@@ -263,8 +267,8 @@ class HTMLBuilder(object):
         print('  <tr><!-- outer No.3 -->')
         print('    <td align="right">')
 
-        print('    削除パス：<input type="text" name="pass" value="" style="width:120px;height:18px;color:black;background:white;border:1px solid silver">')
-        print('    <input type="submit" name="kill" value="削除" style="width:50px;height:18px;color:black;background:white;border:1px solid silver">')
+        print('    ' + _('削除パス') + ': <input type="text" name="pass" value="" style="width:120px;height:18px;color:black;background:white;border:1px solid silver">')
+        print('    <input type="submit" name="kill" value="' + _('削除') + '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver">')
 
         print('    </td>')
         print('  </tr><!-- outer No.3 -->')
