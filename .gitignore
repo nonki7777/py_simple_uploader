@@ -1,0 +1,6 @@
+src/*.jpeg
+src/*.jpg
+src/*.png
+src/*.gif
+db/*.txt
+run
