@@ -26,20 +26,24 @@ dir_db  = 'db'
 thiscgifile = os.path.basename(__file__)
 
 
-def analyze_form():
+def getcwd():
+    return os.getcwd()
+
+
+class FormAnalyzer(object):
     """HTMLのformパラメーターを調べて結果を出力するための前処理を行う"""
     
-    def analyze_main():
+    def run(self):
         result = ''
         page = 0
         gotoredirect = True
         form = cgi.FieldStorage()
         if form.has_key('file') and form.has_key('author'):
-            result = save_uploaded_file(form)
+            result = self.save_uploaded_file(form)
         elif form.has_key('kill') and form.has_key('target'):
-            result = delete_saved_files(form)
+            result = self.delete_saved_files(form)
         elif form.has_key('page'):
-            page = set_page(form)
+            page = self.set_page(form)
             if page == -1:
                 result = 'ページ番号が不正です。'
             else:
@@ -50,20 +54,20 @@ def analyze_form():
             gotoredirect = False
         return (result, page, gotoredirect)
 
-    def chkExt(ext):
+    def chkExt(self, ext):
         return re.match('^\.(jpe?g|png|gif)$', ext)
 
-    def save_uploaded_file(form):
+    def save_uploaded_file(self, form):
         item = form['file']
         author = form['author']
         if not (item.file and item.filename):
             return 'ファイルが指定されていません。'
         base, ext = os.path.splitext(item.filename)
-        if not chkExt(ext):
+        if not self.chkExt(ext):
             return '許可されていない拡張子です。'
         now = int(time())
         fname = str(now) + ext
-        fsrc = os.path.join(os.getcwd(), dir_src)
+        fsrc = os.path.join(getcwd(), dir_src)
         fpath = os.path.join(fsrc, fname)
         fout = file(fpath, 'wb')
         upcnt = 0  # 受信バイト数をkBで表す
@@ -87,7 +91,7 @@ def analyze_form():
             os.remove(fpath)
             return '画像データではありません。'
         if author.value:
-            fout = file(os.path.join(os.getcwd(), dir_db, \
+            fout = file(os.path.join(getcwd(), dir_db, \
                 str(now) + '.txt'), 'wa')
             fout.write(author.value)
             fout.close()
@@ -95,22 +99,22 @@ def analyze_form():
             oldestfile = sorted(os.listdir(fsrc))[0]
             base = os.path.splitext(oldestfile)[0]
             src = os.path.join(fsrc, oldestfile)
-            db = os.path.join(os.getcwd(), dir_db, base + '.txt')
+            db = os.path.join(getcwd(), dir_db, base + '.txt')
             if os.path.isfile(src):
                 os.remove(src)
             if os.path.isfile(db):
                 os.remove(db)
         return 'アップロード完了。'
 
-    def delete_saved_files(form):
+    def delete_saved_files(self, form):
         if form.has_key('pass'):
             upass = form['pass'].value
         else:
             upass = ''
         opass = ''
         base, ext = os.path.splitext(form['target'].value)
-        src = os.path.join(os.getcwd(), dir_src, form['target'].value)
-        db = os.path.join(os.getcwd(), dir_db, base + '.txt')
+        src = os.path.join(getcwd(), dir_src, form['target'].value)
+        db = os.path.join(getcwd(), dir_db, base + '.txt')
         if os.path.isfile(db):
             f = open(db, 'ra')
             opass = f.read()
@@ -124,7 +128,7 @@ def analyze_form():
         else:
             return 'パスワードが違います。'
 
-    def set_page(form):
+    def set_page(self, form):
         try:
             page = int(form['page'].value)
             if page < 0:
@@ -133,19 +137,17 @@ def analyze_form():
             page = -1
         return page
 
-    return analyze_main()
 
+class HTMLBuilder(object):
 
-def make_html(result, page, gotoredirect):
-
-    def make_main(result, page, gotoredirect):
-        html_header()
+    def run(self, result, page, gotoredirect):
+        self.html_header()
         if gotoredirect:
-            html_refresh(result)
+            self.html_refresh(result)
         else:
-            html_normal(page)
+            self.html_normal(page)
 
-    def html_header():
+    def html_header(self):
         print('Content-type: text/html')
         print()
         print('<!DOCTYPE html>')
@@ -156,7 +158,7 @@ def make_html(result, page, gotoredirect):
         print('<title>uploader</title>')
         print('<style>*{font-size:9pt;color:#404040}a{color:#409060;text-decoration:none;}</style>')
 
-    def html_refresh(result):
+    def html_refresh(self, result):
         print('<META http-equiv="refresh" content="3; url=%s">' % thiscgifile)
         print('</head>')
         print('<body>')
@@ -165,7 +167,7 @@ def make_html(result, page, gotoredirect):
         print('しばらくお待ちください。 ... <a href="%s" target="_self">戻る</a><br>' % thiscgifile)
         print('</body></html>')
 
-    def html_normal(page):
+    def html_normal(self, page):
         print('</head>')
         print('<body>')
         print('<div align="center">')
@@ -213,7 +215,7 @@ def make_html(result, page, gotoredirect):
         print('    <th width="100">容量</th>')
         print('  </tr>')
         cnt = 0
-        all_sorted_list = reversed(sorted(os.listdir(os.path.join(os.getcwd(),
+        all_sorted_list = reversed(sorted(os.listdir(os.path.join(getcwd(),
             dir_src))))
         sorted_list = []
         # os.listdirではドット(.)で始まるファイルも捕捉してしまうので除去する
@@ -268,11 +270,11 @@ def make_html(result, page, gotoredirect):
         print('</div>')
         print('</body></html>')
 
-    make_main(result, page, gotoredirect)
-
 
 def main():
-    aresult, apage, agotoredirect = analyze_form()
-    make_html(aresult, apage, agotoredirect)
+    fa = FormAnalyzer()
+    aresult, apage, agotoredirect = fa.run()
+    hb = HTMLBuilder()
+    hb.run(aresult, apage, agotoredirect)
 
 main()

@@ -1,3 +1,4 @@
+*.pyc
 src/*.jpeg
 src/*.jpg
 src/*.png
