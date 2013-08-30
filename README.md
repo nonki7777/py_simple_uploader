@@ -1,7 +1,3 @@
-Pythonを使って簡単なファイルアップローダーを作ってみました。
-「作った」とは言っても、ベースとなったスクリプトがあってそれを改造したのですが。。。
-
-使いかた：
- git cloneでフォルダーを作成し、pyファイルにchmod 0755で実行権限を与えて
- .htaccessファイルを少し変更すれば動くと思います。
+This script is a simple file uploader using Python.
+Very easy to use.
 

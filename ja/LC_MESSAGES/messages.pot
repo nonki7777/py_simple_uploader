@@ -1,0 +1,129 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2013-08-30 08:55+MDT\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: fileupl.py:62
+msgid "Invalid page number spacified."
+msgstr ""
+
+#: fileupl.py:66
+msgid "Invalid form parameter."
+msgstr ""
+
+#: fileupl.py:104
+msgid "No uploading file name specified."
+msgstr ""
+
+#: fileupl.py:107
+msgid "File extension not allowed."
+msgstr ""
+
+#: fileupl.py:116
+msgid "File size too large (max %s KB)"
+msgstr ""
+
+#: fileupl.py:120
+msgid "Not an image data."
+msgstr ""
+
+#: fileupl.py:127
+msgid "File successfully uploaded."
+msgstr ""
+
+#: fileupl.py:145
+msgid "The file successfully deleted."
+msgstr ""
+
+#: fileupl.py:147
+msgid "Invalid password."
+msgstr ""
+
+#: fileupl.py:185
+msgid "Wait a moment ... <a href=\"%s target=\"_self\""
+msgstr ""
+
+#: fileupl.py:186
+msgid "back"
+msgstr ""
+
+#: fileupl.py:196
+msgid "A simple file uploader."
+msgstr ""
+
+#: fileupl.py:197
+msgid "You can upload an image file up to %s MB."
+msgstr ""
+
+#: fileupl.py:199
+msgid "  If the server gets full, older files would be deleted."
+msgstr ""
+
+#: fileupl.py:201
+msgid "Read more information at <a href=\"/\" target=\"_blank\">its top page</a>."
+msgstr ""
+
+#: fileupl.py:211
+msgid "a new post"
+msgstr ""
+
+#: fileupl.py:212
+msgid "file (max. %s KB)"
+msgstr ""
+
+#: fileupl.py:216
+msgid "pass code to delete (option)"
+msgstr ""
+
+#: fileupl.py:217
+msgid "post"
+msgstr ""
+
+#: fileupl.py:218
+msgid "max. number of files"
+msgstr ""
+
+#: fileupl.py:219
+msgid "up to "
+msgstr ""
+
+#: fileupl.py:232
+msgid "stored files"
+msgstr ""
+
+#: fileupl.py:235
+msgid "select"
+msgstr ""
+
+#: fileupl.py:236
+msgid "file name"
+msgstr ""
+
+#: fileupl.py:237
+msgid "date"
+msgstr ""
+
+#: fileupl.py:238
+msgid "size"
+msgstr ""
+
+#: fileupl.py:271
+msgid "pass code to delete"
+msgstr ""
+
+#: fileupl.py:272
+msgid "delete"
+msgstr ""
+
