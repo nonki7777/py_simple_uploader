@@ -1,0 +1,134 @@
+# Japanese translations for py_simple_uploader.
+# Copyright (C) 2013 THE drupal'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the drupal package.
+# nobutoshi <nobutoshi@ub1204lts>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: py_simple_uploader\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-09-04 16:42-0600\n"
+"PO-Revision-Date: 2013-09-04 16:42-0600\n"
+"Last-Translator: nonki7777 <nonki7777@gmail.com>\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: fileupl.py:66
+msgid "Invalid page number spacified."
+msgstr "ページ番号が不正です。"
+
+#: fileupl.py:70
+msgid "Invalid form parameter."
+msgstr "フォーム要素が不正です。"
+
+#: fileupl.py:108
+msgid "No uploading file name specified."
+msgstr "ファイル名が指定されていません。"
+
+#: fileupl.py:111
+msgid "File extension not allowed."
+msgstr "許可されていない拡張子です。"
+
+#: fileupl.py:120
+#, python-format
+msgid "File size too large (max %s KB)"
+msgstr "ファイルサイズが大きすぎます。(%s KBまで)"
+
+#: fileupl.py:124
+msgid "Not an image data."
+msgstr "画像データではありません。"
+
+#: fileupl.py:131
+msgid "File successfully uploaded."
+msgstr "アップロード完了。"
+
+#: fileupl.py:149
+msgid "The file successfully deleted."
+msgstr "削除完了。"
+
+#: fileupl.py:151
+msgid "Invalid password."
+msgstr "パスワードが違います。"
+
+#: fileupl.py:189
+msgid "Wait a moment"
+msgstr "しばらくお待ちください。"
+
+#: fileupl.py:191
+msgid "back"
+msgstr "戻る"
+
+#: fileupl.py:201
+msgid "A simple file uploader."
+msgstr "簡易アップローダ。"
+
+#: fileupl.py:202
+#, python-format
+msgid "You can upload an image file up to %s MB."
+msgstr "%s MBまでの画像ファイルをアップロードできます。"
+
+#: fileupl.py:204
+msgid "  If the server gets full, older files would be deleted."
+msgstr "また、古い順から画像は削除されます。"
+
+#: fileupl.py:206
+msgid ""
+"Read more information at <a href=\"/\" target=\"_blank\">its top page</a>."
+msgstr "その他の情報は<a href=\"/\" target=\"_blank\">こちら</a>をご覧ください。"
+
+#: fileupl.py:216
+msgid "a new post"
+msgstr "新規投稿"
+
+#: fileupl.py:217
+#, python-format
+msgid "file (max %s KB)"
+msgstr "ファイル (%s KBまで)"
+
+#: fileupl.py:221
+msgid "pass code to delete (option)"
+msgstr "削除パス(任意)"
+
+#: fileupl.py:222
+msgid "post"
+msgstr "投稿"
+
+#: fileupl.py:223
+msgid "max. number of files"
+msgstr "ファイル保持数"
+
+#: fileupl.py:224
+msgid "up to "
+msgstr "最大"
+
+#: fileupl.py:237
+msgid "stored files"
+msgstr "保管ファイル"
+
+#: fileupl.py:240
+msgid "select"
+msgstr "選択"
+
+#: fileupl.py:241
+msgid "file name"
+msgstr "ファイル名"
+
+#: fileupl.py:242
+msgid "date"
+msgstr "日付"
+
+#: fileupl.py:243
+msgid "size"
+msgstr "容量"
+
+#: fileupl.py:276
+msgid "pass code to delete"
+msgstr "削除パス"
+
+#: fileupl.py:277
+msgid "delete"
+msgstr "削除"

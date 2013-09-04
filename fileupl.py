@@ -5,7 +5,7 @@ A simple file uploader using Python
 Confirmed workable on version 2.6.6
 '''
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 from time import time, localtime, strftime
 import commands
@@ -14,9 +14,14 @@ import os, re
 import sys
 import gettext
 
-_ = gettext.translation(
+def getcwd():
+    return os.getcwd()
+
+gettext.install(
         domain='fileupl',
-        fallback=True).ugettext
+        localedir=getcwd(),
+        names=('ngettext',)
+        )
 
 # import cgitb
 # cgitb.enable()
@@ -30,9 +35,6 @@ dir_db  = 'db'
 
 thiscgifile = os.path.basename(__file__)
 
-
-def getcwd():
-    return os.getcwd()
 
 def remove(filename):
     if os.path.isfile(filename):
@@ -184,7 +186,7 @@ class HTMLBuilder(object):
         print('<META http-equiv="refresh" content="3; url=%s">' % thiscgifile)
         print('</head>')
         print('<body>')
-        print('%s<br>' % result)
+        print(result, '<br>')
         print('<br>')
         print(_('Wait a moment'), \
                 ' ... <a href="%s target="_self">' % thiscgifile, \
@@ -198,11 +200,12 @@ class HTMLBuilder(object):
 
         print('<table width="830" cellspacing="0" cellpadding="0" style="margin:10px;">')
         print('<td>')
-        print('<li>' + _('A simple file uploader.'))
-        print('<li>' + _('You can upload an image file up to %s MB.') \
-            % str(up_limit / 1024) + \
+        # print(_('A simple file uploader.'), file=sys.stderr)
+        print('<li>', _('A simple file uploader.'))
+        print('<li>', _('You can upload an image file up to %s MB.') \
+            % str(up_limit / 1024), \
             _('  If the server gets full, older files would be deleted.'))
-        print('<li>' + \
+        print('<li>', \
             _('Read more information at <a href="/" target="_blank">its top page</a>.'))
         print('</td>')
         print('</table>')
@@ -213,16 +216,16 @@ class HTMLBuilder(object):
         print('<form action="%s" method="post" enctype="multipart/form-data">' % thiscgifile)
 
         print('<fieldset style="border:2px solid silver">')
-        print('<legend>' + _('a new post') + '</legend>')
+        print('<legend>', _('a new post'), '</legend>')
         print(_('file (max %s KB)') % str(up_limit), ': ', \
             '<input type="file" name="file" ', \
             "style=\"height:18px;color:black;background:white;border:1px ", \
             "solid silver\" />")
-        print(_('pass code to delete (option)') + ': <input type="text" name="author" style="width:80px;height:18px;color:black;background:white;border:1px solid silver" />')
-        print('<input type="submit" value="' + _("post") + '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver" />')
-        print('<span align="right">' + _("max. number of files") + ':' + \
-                str(maxfilenum) + ' (' + _('up to ') \
-            + str(maxfilenum*up_limit/1024) + 'MB)</span>')
+        print(_('pass code to delete (option)'), ': <input type="text" name="author" style="width:80px;height:18px;color:black;background:white;border:1px solid silver" />')
+        print('<input type="submit" value="', _("post"), '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver" />')
+        print('<span align="right">', _("max. number of files"), ':' + \
+                str(maxfilenum) + ' (', _('up to '), \
+                str(maxfilenum*up_limit/1024) + 'MB)</span>')
         print('</fieldset>')
 
         print('</form>')
@@ -234,13 +237,13 @@ class HTMLBuilder(object):
         print('  <table id="listview" border="1" rules="all"')
         print('    cellpadding="5" style="display:block;">')
         print('  <tr>')
-        print('    <td colspan="4">' + _('stored files') + '</td>')
+        print('    <td colspan="4">', _('stored files'), '</td>')
         print('  </tr>')
         print('  <tr>')
-        print('    <th width="80">' + _('select') + '</th>')
-        print('    <th width="320">' + _('file name') + '</th>')
-        print('    <th width="320">' + _('date') + '</th>')
-        print('    <th width="100">' + _('size') + '</th>')
+        print('    <th width="80">', _('select'), '</th>')
+        print('    <th width="320">', _('file name'), '</th>')
+        print('    <th width="320">', _('date'), '</th>')
+        print('    <th width="100">', _('size'), '</th>')
         print('  </tr>')
         cnt = 0
         all_sorted_list = reversed(sorted(listdir(os.path.join(getcwd(),
@@ -273,8 +276,8 @@ class HTMLBuilder(object):
         print('  <tr><!-- outer No.3 -->')
         print('    <td align="right">')
 
-        print('    ' + _('pass code to delete') + ': <input type="text" name="pass" value="" style="width:120px;height:18px;color:black;background:white;border:1px solid silver">')
-        print('    <input type="submit" name="kill" value="' + _('delete') + '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver">')
+        print('    ', _('pass code to delete'), ': <input type="text" name="pass" value="" style="width:120px;height:18px;color:black;background:white;border:1px solid silver">')
+        print('    <input type="submit" name="kill" value="', _('delete'), '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver">')
 
         print('    </td>')
         print('  </tr><!-- outer No.3 -->')

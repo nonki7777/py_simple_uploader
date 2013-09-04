@@ -1,0 +1,3 @@
+#!/bin/bash
+xgettext -k"_" -o fileupl.po fileupl.py
+msginit --locale=ja --input=fileupl.po --output=ja.po
