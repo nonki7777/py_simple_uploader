@@ -19,7 +19,7 @@ def getcwd():
 
 gettext.install(
         domain='fileupl',
-        localedir=getcwd(),
+        localedir=os.path.join(getcwd(), 'locale'),
         names=('ngettext',)
         )
 
