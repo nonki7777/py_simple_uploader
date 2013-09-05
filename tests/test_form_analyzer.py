@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import unittest
+from mock import patch
 from fileupl import FormAnalyzer
 
 
@@ -18,6 +19,9 @@ class TestFormAnalyzer(unittest.TestCase):
         for b in badlist:
             f = fa.chkExt(b)
             self.assertTrue(not f)
+
+    def test_do_upload(self):
+        pass
     
 
 if __name__ == "__main__":

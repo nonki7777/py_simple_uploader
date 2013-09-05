@@ -77,7 +77,8 @@ class FormAnalyzer(object):
     def chkExt(self, ext):
         return re.match('^\.(jpe?g|png|gif)$', ext)
     
-    def do_upload(self, rf, wf, fpath):
+    def do_upload(self, rf, fpath):
+        wf = file(fpath, 'wb')
         upcnt = 0
         while True:
             upcnt += 1
@@ -115,8 +116,7 @@ class FormAnalyzer(object):
         fname = str(now) + ext
         fsrc = os.path.join(getcwd(), dir_src)
         fpath = os.path.join(fsrc, fname)
-        fout = file(fpath, 'wb')
-        reach_max = self.do_upload(item.file, fout, fpath)
+        reach_max = self.do_upload(item.file, fpath)
         if reach_max:
             remove(fpath)
             return _('File size too large (max %s KB)') \
