@@ -4,4 +4,5 @@ src/*.jpg
 src/*.png
 src/*.gif
 db/*.txt
+.htaccess
 run
