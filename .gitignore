@@ -1,4 +1,6 @@
 *.pyc
+*.swp
+*.log
 src/*.jpeg
 src/*.jpg
 src/*.png

@@ -10,9 +10,11 @@ from __future__ import print_function, unicode_literals
 from time import time, localtime, strftime
 import commands
 import cgi
-import os, re
+import os
+import re
 import sys
 import gettext
+
 
 def getcwd():
     return os.getcwd()
@@ -26,12 +28,12 @@ gettext.install(
 # import cgitb
 # cgitb.enable()
 
-up_limit    = 3072  # max. file size (KB)
+up_limit = 3072  # max. file size (KB)
 item_bypage = 10    # max. number of file names displayed on a page
-maxfilenum  = 50    # max. number of files to be stored on a server
+maxfilenum = 50    # max. number of files to be stored on a server
 
 dir_src = 'src'
-dir_db  = 'db'
+dir_db = 'db'
 
 thiscgifile = os.path.basename(__file__)
 
@@ -40,35 +42,45 @@ def remove(filename):
     if os.path.isfile(filename):
         os.remove(filename)
 
+
 def listdir(fpath):
     return os.listdir(fpath)
 
+
 def chmod(fpath):
     os.system('chmod 644 ' + fpath)
+
 
 def isfileimage(fpath):
     return commands.getoutput('file ' + fpath).find("image") == -1
 
 
+def writedirfile(fpath, value):
+    fout = file(fpath, 'wa')
+    fout.write(value)
+    fout.close()
+
+
+
 class FormAnalyzer(object):
     """Receives form parameters and manages save/delete uploaded files"""
-    
+
     def run(self):
         result = ''
         page = 0
         gotoredirect = True
         form = cgi.FieldStorage()
-        if form.has_key('file') and form.has_key('author'):
+        if 'file' in form and 'author' in form:
             result = self.save_uploaded_file(form)
-        elif form.has_key('kill') and form.has_key('target'):
+        elif 'kill' in form and 'target' in form:
             result = self.delete_saved_files(form)
-        elif form.has_key('page'):
+        elif 'page' in form:
             page = self.set_page(form)
             if page == -1:
                 result = _('Invalid page number spacified.')
             else:
                 gotoredirect = False
-        elif form.has_key('file') or form.has_key('kill'):
+        elif 'file' in form or 'kill' in form:
             result = _('Invalid form parameter.')
         else:
             gotoredirect = False
@@ -76,7 +88,7 @@ class FormAnalyzer(object):
 
     def chkExt(self, ext):
         return re.match('^\.(jpe?g|png|gif)$', ext)
-    
+
     def do_upload(self, rf, fpath):
         wf = file(fpath, 'wb')
         upcnt = 0
@@ -125,15 +137,13 @@ class FormAnalyzer(object):
             remove(fpath)
             return _('Not an image data.')
         if author.value:
-            fout = file(os.path.join(getcwd(), dir_db, \
-                str(now) + '.txt'), 'wa')
-            fout.write(author.value)
-            fout.close()
+            writedirfile(os.path.join(getcwd(), dir_db, \
+                str(now) + '.txt'), author.value)
         self.delete_oldest()
         return _('File successfully uploaded.')
 
     def delete_saved_files(self, form):
-        if form.has_key('pass'):
+        if 'pass' in form:
             upass = form['pass'].value
         else:
             upass = ''
@@ -178,9 +188,11 @@ class HTMLBuilder(object):
         print('<html>')
         print('<head>')
         print('<meta http-equiv="cache-control" content="no-cache" />')
-        print('<meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />')
+        print('<meta http-equiv="Content-Type" content="text/html"'
+                ' charset="UTF-8" />')
         print('<title>uploader</title>')
-        print('<style>*{font-size:9pt;color:#404040}a{color:#409060;text-decoration:none;}</style>')
+        print('<style>*{font-size:9pt;color:#404040}'
+                'a{color:#409060;text-decoration:none;}</style>')
 
     def html_refresh(self, result):
         print('<META http-equiv="refresh" content="3; url=%s">' % thiscgifile)
@@ -198,7 +210,8 @@ class HTMLBuilder(object):
         print('<body>')
         print('<div align="center">')
 
-        print('<table width="830" cellspacing="0" cellpadding="0" style="margin:10px;">')
+        print('<table width="830" cellspacing="0" cellpadding="0"'
+                ' style="margin:10px;">')
         print('<td>')
         # print(_('A simple file uploader.'), file=sys.stderr)
         print('<li>', _('A simple file uploader.'))
@@ -206,14 +219,16 @@ class HTMLBuilder(object):
             % str(up_limit / 1024), \
             _('  If the server gets full, older files would be deleted.'))
         print('<li>', \
-            _('Read more information at <a href="/" target="_blank">its top page</a>.'))
+            _('Read more information at <a href="/" target="_blank">'
+                'its top page</a>.'))
         print('</td>')
         print('</table>')
 
         print('<table id="outer" width="830" cellspacing="0" cellpadding="0">')
 
         print('<tr><td><!-- outer No.1 -->')
-        print('<form action="%s" method="post" enctype="multipart/form-data">' % thiscgifile)
+        print('<form action="%s" method="post"'
+                ' enctype="multipart/form-data">' % thiscgifile)
 
         print('<fieldset style="border:2px solid silver">')
         print('<legend>', _('a new post'), '</legend>')
@@ -221,11 +236,16 @@ class HTMLBuilder(object):
             '<input type="file" name="file" ', \
             "style=\"height:18px;color:black;background:white;border:1px ", \
             "solid silver\" />")
-        print(_('pass code to delete (option)'), ': <input type="text" name="author" style="width:80px;height:18px;color:black;background:white;border:1px solid silver" />')
-        print('<input type="submit" value="', _("post"), '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver" />')
+        print(_('pass code to delete (option)'), ': '
+                '<input type="text" name="author" '
+                'style="width:80px;height:18px;color:black;'
+                'background:white;border:1px solid silver" />')
+        print('<input type="submit" value="', _("post"), \
+                '" style="width:50px;height:18px;color:black;'
+                'background:white;border:1px solid silver" />')
         print('<span align="right">', _("max. number of files"), ':' + \
                 str(maxfilenum) + ' (', _('up to '), \
-                str(maxfilenum*up_limit/1024) + 'MB)</span>')
+                str(maxfilenum * up_limit / 1024) + 'MB)</span>')
         print('</fieldset>')
 
         print('</form>')
@@ -253,21 +273,24 @@ class HTMLBuilder(object):
             if item[0] != '.':
                 sorted_list.append(item)
         for file in sorted_list:
-            if (cnt >= item_bypage * page) and (cnt < item_bypage * (page + 1)):
+            if (cnt >= item_bypage * page) and \
+                    (cnt < item_bypage * (page + 1)):
                 href = os.path.join("./", dir_src, file)
                 base, ext = os.path.splitext(file)
                 print('  <tr>')
-                print('    <td><input type="radio" name="target" value="%s"></td>' % file)
-                print('    <td><a href="%s" target="_blank">%s</a></td>' % (href, file))
+                print('    <td><input type="radio" name="target" '
+                        'value="%s"></td>' % file)
+                print('    <td><a href="%s" target="_blank">%s</a>'
+                        '</td>' % (href, file))
                 print('    <td>%s</td>' %
-                    strftime('%Y/%m/%d %H:%M:%S',localtime(int(base))))
+                    strftime('%Y/%m/%d %H:%M:%S', localtime(int(base))))
                 fsize = os.path.getsize(os.path.join("./", dir_src, file))
                 if fsize < 1024:
-                    fsize = str(fsize)+"Byte"
+                    fsize = str(fsize) + "Byte"
                 elif fsize < 1024 * 1024:
-                    fsize = str(fsize/1024)+'KB'
+                    fsize = str(fsize / 1024) + 'KB'
                 else:
-                    fsize = str(fsize/1024/1024)+'MB'
+                    fsize = str(fsize / 1024 / 1024) + 'MB'
                 print('    <td>%s</td>' % fsize)
                 print('  </tr>')
             cnt += 1
@@ -276,8 +299,14 @@ class HTMLBuilder(object):
         print('  <tr><!-- outer No.3 -->')
         print('    <td align="right">')
 
-        print('    ', _('pass code to delete'), ': <input type="text" name="pass" value="" style="width:120px;height:18px;color:black;background:white;border:1px solid silver">')
-        print('    <input type="submit" name="kill" value="', _('delete'), '" style="width:50px;height:18px;color:black;background:white;border:1px solid silver">')
+        print('    ', _('pass code to delete'), ': '
+                '<input type="text" name="pass" value="" '
+                'style="width:120px;height:18px;color:black;'
+                'background:white;border:1px solid silver">')
+        print('    <input type="submit" name="kill" '
+                'value="', _('delete'), '" style="width:50px;'
+                'height:18px;color:black;background:white;'
+                'border:1px solid silver">')
 
         print('    </td>')
         print('  </tr><!-- outer No.3 -->')
@@ -286,11 +315,15 @@ class HTMLBuilder(object):
 
         print('    <<')
         print('      ')
-        for i in xrange(int(cnt / item_bypage) + ( 0 if (cnt%item_bypage) == 0 else 1 )):
+        maxpage = int(cnt / item_bypage)
+        if (cnt % item_bypage) != 0:
+            maxpage += 1
+        for i in xrange(maxpage):
             if i == page:
                 print('[%s] ' % str(page + 1))
             else:
-                print('[<a href="%s?page=%s">%s</a>] ' % (thiscgifile, str(i), str(i+1)))
+                print('[<a href="%s?page=%s">%s</a>] ' % \
+                        (thiscgifile, str(i), str(i + 1)))
         print('    >>')
         print('    </td>')
         print('  </tr><!-- outer No.4 -->')
