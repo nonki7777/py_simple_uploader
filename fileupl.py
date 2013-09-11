@@ -119,7 +119,7 @@ class FormAnalyzer(object):
     def save_uploaded_file(self, form):
         item = form['file']
         author = form['author']
-        if not (item.file and item.filename):
+        if (not item.file) or (not item.filename):
             return _('No uploading file name specified.')
         base, ext = os.path.splitext(item.filename)
         if not self.chkExt(ext):

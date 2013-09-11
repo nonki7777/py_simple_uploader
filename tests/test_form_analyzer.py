@@ -121,7 +121,10 @@ class TestFormAnalyzer(unittest.TestCase):
     def test_save_uploaded_file(self, delete_oldest, writedirfile,
             isfileimage, remove, do_upload, m_):
         delete_oldest.return_value = True
-        writedirfile.return_value = True
+        self.cc = 'a'
+        def chk(a, b):
+            self.cc = b
+        writedirfile.side_effect = chk
         isfileimage.return_value = True
         remove.return_value = True
         do_upload.return_value = True
@@ -129,9 +132,10 @@ class TestFormAnalyzer(unittest.TestCase):
         m_.side_effect = _
 
         mitem = mock.Mock()
+        mau = mock.Mock()
 
         mitem.file = ''
-        m1 = dict(file=mitem, author=None)
+        m1 = dict(file=mitem, author=mau)
         logging.debug('mitem.file')
         logging.debug(mitem.file)
         fa = fileupl.FormAnalyzer()
@@ -142,11 +146,28 @@ class TestFormAnalyzer(unittest.TestCase):
         mitem.filename = '/home/foo/mocktest.txt'
         self.assertEqual(fa.save_uploaded_file(m1),
                 _('File extension not allowed.'))
-        # mitem = mock.Mock()
-        # mitem.file = 1
-        # mitem.filename = '/home/foo/mocktest.jpg'
-        # mform = mock.Mock()
-        # mform
+
+        mitem.filename = '/home/foo/mocktest.jpg'
+        self.assertEqual(fa.save_uploaded_file(m1),
+                _('File size too large (max %s KB)') \
+                        % str(fileupl.up_limit))
+
+        do_upload.return_value = False
+        self.assertEqual(fa.save_uploaded_file(m1),
+                _('Not an image data.'))
+
+        isfileimage.return_value = False
+        self.cc = 'a'
+        mau.value = ''
+        r = fa.save_uploaded_file(m1)
+        self.assertEqual(r,
+                _('File successfully uploaded.'))
+        self.assertEqual(self.cc, 'a')
+        mau.value = '123'
+        r = fa.save_uploaded_file(m1)
+        self.assertEqual(r,
+                _('File successfully uploaded.'))
+        self.assertEqual(self.cc, '123')
 
 
 if __name__ == "__main__":
