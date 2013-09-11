@@ -61,6 +61,15 @@ def writedirfile(fpath, value):
     fout.close()
 
 
+def readdirfile(fpath):
+    if os.path.isfile(fpath):
+        fin = file(fpath, 'ra')
+        r = fin.read()
+        fin.close()
+    else:
+        r = ''
+    return r
+
 
 class FormAnalyzer(object):
     """Receives form parameters and manages save/delete uploaded files"""
@@ -77,7 +86,7 @@ class FormAnalyzer(object):
         elif 'page' in form:
             page = self.set_page(form)
             if page == -1:
-                result = _('Invalid page number spacified.')
+                result = _('Invalid page number specified.')
             else:
                 gotoredirect = False
         elif 'file' in form or 'kill' in form:
@@ -151,10 +160,7 @@ class FormAnalyzer(object):
         base, ext = os.path.splitext(form['target'].value)
         src = os.path.join(getcwd(), dir_src, form['target'].value)
         db = os.path.join(getcwd(), dir_db, base + '.txt')
-        if os.path.isfile(db):
-            f = open(db, 'ra')
-            opass = f.read()
-            f.close()
+        opass = readdirfile(db)
         if upass == opass:
             remove(src)
             remove(db)

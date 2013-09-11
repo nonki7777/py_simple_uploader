@@ -27,6 +27,48 @@ def open_temp_file(size=128):
 
 
 class TestFormAnalyzer(unittest.TestCase):
+    class TestField(object):
+        def __init__(self, value):
+            self.value = value
+
+    fields = { "file": TestField("foo") }
+
+    @mock.patch('__builtin__._')
+    @mock.patch('fileupl.FormAnalyzer.save_uploaded_file')
+    @mock.patch('fileupl.FormAnalyzer.delete_saved_files')
+    @mock.patch('fileupl.FormAnalyzer.set_page')
+    @mock.patch('cgi.FieldStorage')
+    def test_run(self, MockClass, set_page, delete_saved_files,
+            save_uploaded_file, m_):
+        instance = MockClass.return_value
+        instance.__getitem__ = lambda s, key: self.fields[key]
+        instance.__contains__ = lambda s, key: key in self.fields
+        set_page.return_value = 0
+        delete_saved_files.return_value = 'dsf'
+        save_uploaded_file.return_value = 'suf'
+        def _(message): return message
+        m_.side_effect = _
+        fa = fileupl.FormAnalyzer()
+        self.fields["file"] = self.TestField("foo")
+        self.fields["author"] = self.TestField("a1")
+        self.assertEqual(fa.run(), ('suf', 0, True))
+        self.fields.clear()
+        self.fields["kill"] = self.TestField("k")
+        self.fields["target"] = self.TestField("t")
+        self.assertEqual(fa.run(), ('dsf', 0, True))
+        self.fields.clear()
+        self.fields["page"] = self.TestField("p")
+        set_page.return_value = 1
+        self.assertEqual(fa.run(), ('', 1, False))
+        set_page.return_value = -1
+        self.assertEqual(fa.run(), (_('Invalid page number specified.'),
+            -1, True))
+        self.fields.clear()
+        self.fields["file"] = self.TestField("foo")
+        self.assertEqual(fa.run(), (_('Invalid form parameter.'),
+            0, True))
+        self.fields.clear()
+        self.assertEqual(fa.run(), ('', 0, False))
 
     def test_chkExt(self):
         fa = fileupl.FormAnalyzer()
@@ -168,6 +210,53 @@ class TestFormAnalyzer(unittest.TestCase):
         self.assertEqual(r,
                 _('File successfully uploaded.'))
         self.assertEqual(self.cc, '123')
+
+    @mock.patch('__builtin__._')
+    @mock.patch('fileupl.remove')
+    @mock.patch('fileupl.readdirfile')
+    def test_delete_saved_file(self, readdirfile, remove, m_):
+        remove.return_value = True
+        def _(message): return message
+        m_.side_effect = _
+
+        mpass = mock.Mock()
+        mtarget = mock.Mock()
+        mtarget.value = '/home/foo/mtgt.txt'
+        m1 = dict(target=mtarget)
+        m1['pass'] = mpass
+        mpass.value = ''
+        readdirfile.return_value = ''
+        logging.debug('m1[\'pass\'].value')
+        logging.debug(m1['pass'].value)
+        fa = fileupl.FormAnalyzer()
+        self.assertEqual(fa.delete_saved_files(m1),
+                _('The file successfully deleted.'))
+        mpass.value = ''
+        readdirfile.return_value = '123'
+        self.assertEqual(fa.delete_saved_files(m1),
+                _('Invalid password.'))
+        mpass.value = '1234'
+        readdirfile.return_value = '1234'
+        self.assertEqual(fa.delete_saved_files(m1),
+                _('The file successfully deleted.'))
+
+    def test_set_page(self):
+        mp = mock.Mock()
+        m1 = dict(page=mp)
+        mp.value = ''
+        fa = fileupl.FormAnalyzer()
+        self.assertEqual(fa.set_page(m1), -1)
+        mp.value = '0'
+        self.assertEqual(fa.set_page(m1), 0)
+        mp.value = '43'
+        self.assertEqual(fa.set_page(m1), 43)
+        mp.value = '-5'
+        self.assertEqual(fa.set_page(m1), -1)
+        mp.value = '-4.5'
+        self.assertEqual(fa.set_page(m1), -1)
+        mp.value = 'a'
+        self.assertEqual(fa.set_page(m1), -1)
+
 
 
 if __name__ == "__main__":

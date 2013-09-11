@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: fileupl.py:66
-msgid "Invalid page number spacified."
+msgid "Invalid page number specified."
 msgstr "ページ番号が不正です。"
 
 #: fileupl.py:70
